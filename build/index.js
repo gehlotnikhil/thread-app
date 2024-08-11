@@ -13,46 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const server_1 = require("@apollo/server");
+const graphql_1 = require("./graphql");
 const express4_1 = require("@apollo/server/express4");
-const db_1 = require("./lib/db");
 const init = () => __awaiter(void 0, void 0, void 0, function* () {
     const app = (0, express_1.default)();
-    //create graphql server
-    const gqlServer = new server_1.ApolloServer({
-        typeDefs: `
-    type Query{
-        hello:String
-        say(name:String):String
-    }
-    type Mutation{
-        createUser(firstName:String!,lastName:String!,email:String!,password:String!) :Boolean
-    }
-    `,
-        resolvers: {
-            Mutation: {
-                createUser: (_1, _a) => __awaiter(void 0, [_1, _a], void 0, function* (_, { firstName, lastName, email, password, }) {
-                    yield db_1.prismaClient.user.create({
-                        data: {
-                            firstName,
-                            lastName,
-                            email,
-                            password,
-                            salt: "random_salt"
-                        },
-                    });
-                    return true;
-                }),
-            },
-            Query: {
-                hello: () => "Hey there, this is from Graphql",
-                say: (_, { name }) => `Hey ${name}, How are you ?`,
-            },
-        },
-    });
-    yield gqlServer.start();
+    yield graphql_1.gqlServer.start();
     app.use(express_1.default.json());
-    app.use("/graphql", (0, express4_1.expressMiddleware)(gqlServer));
+    app.use("/graphql", (0, express4_1.expressMiddleware)(graphql_1.gqlServer));
     app.get("/", (req, res) => {
         res.send({ message: "Server is up and running" });
     });
