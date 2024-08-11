@@ -19,8 +19,18 @@ const init = () => __awaiter(void 0, void 0, void 0, function* () {
     const app = (0, express_1.default)();
     //create graphql server
     const gqlServer = new server_1.ApolloServer({
-        typeDefs: ``,
-        resolvers: {}
+        typeDefs: `
+    type Query{
+        hello:String
+        say(name:String):String
+    }
+    `,
+        resolvers: {
+            Query: {
+                hello: () => "Hey there, this is from Graphql",
+                say: (_, { name }) => `Hey ${name}, How are you ?`
+            }
+        }
     });
     yield gqlServer.start();
     app.use(express_1.default.json());
